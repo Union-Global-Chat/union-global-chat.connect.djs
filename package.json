@@ -1,0 +1,43 @@
+{
+  "name": "union-global-chat.connect.djs",
+  "version": "1.0.0",
+  "description": "Union Global Chatのサーバーと接続しまします。(Discord.JS版)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "discord.js": "^13.7.0",
+    "ws": "^8.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.17.0"
+  },
+  "engines": {
+    "node": "^18.2.0",
+    "vscode": "^1.22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Union-Global-Chat/union-global-chat.connect.djs.git"
+  },
+  "keywords": [
+    "Union",
+    "Union",
+    "Global",
+    "Global",
+    "Chat",
+    "Chat",
+    "Discord.js",
+    "D.js",
+    "DJS",
+    "Renorari",
+    "れのらり"
+  ],
+  "author": "Renorari",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Union-Global-Chat/union-global-chat.connect.djs/issues"
+  },
+  "homepage": "https://github.com/Union-Global-Chat/union-global-chat.connect.djs#readme"
+}
