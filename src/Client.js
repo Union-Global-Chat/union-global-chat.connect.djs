@@ -17,73 +17,79 @@ const Client = class extends EventEmitter {
         super();
         this.token = token;
 
-        this.ws = new ws("wss://ugc.renorari.net/api/v1/gateway");
-        /**
-         * @fires Client#close
-         * @fires Client#error
-         * @fires Client#message
-         * @fires Client#ready
-         */
-        this.ws.on("close", (code, reason) => {
+        function connect(_this) {
+            var wsClient = new ws("wss://ugc.renorari.net/api/v1/gateway");
             /**
-             * Client Close
-             * @event Client#close
-             * @type {object}
-             * @property {number} code - Close code
-             * @property {Buffer} reason - Close reason
+             * @fires Client#close
+             * @fires Client#error
+             * @fires Client#message
+             * @fires Client#ready
              */
-            this.emit("close", { "code": code, "reason": reason });
-        });
-        this.ws.on("error", (err) => {
-            /**
-             * Client Error
-             * @event Client#error
-             * @type {object}
-             * @property {Error} error - Error
-             */
-            this.emit("error", err);
-        });
-        this.ws.on("message", (rawData) => {
-
-            zlib.inflate(rawData, (err, _data) => {
-                if (err) {
-                    return this.emit("error", err);
-                }
-                let data = JSON.parse(_data);
-                if (data.type == "hello") {
-                    this.ws.send(zlib.deflateSync(JSON.stringify({
-                        "type": "identify",
-                        "data": {
-                            "token": this.token
-                        }
-                    }), (err) => {
-                        if (err) this.emit("error", err);
-                    }));
-                } else if (data.type == "message") {
-                    /**
-                     * Client Message
-                     * @event Client#message
-                     * @type {object}
-                     * @property {object} message - UGC Message
-                     */
-                    this.emit("message", data.data.data, data.data.from);
-                } else if (data.type == "identify") {
-                    /**
-                     * Client Ready
-                     * @event Client#ready
-                     * @type {object}
-                     * @property {object} status - UGC status
-                     */
-                    this.emit("ready", data.data);
-                } else if (data.type == "heartbeat") {
-                    /**
-                     * Client Ping
-                     * @type {number}
-                     */
-                    this.ping = new Date().getTime() - data.data.unix_time * 1000;
-                }
+            wsClient.on("close", (code, reason) => {
+                /**
+                 * Client Close
+                 * @event Client#close
+                 * @type {object}
+                 * @property {number} code - Close code
+                 * @property {Buffer} reason - Close reason
+                 */
+                _this.emit("close", { "code": code, "reason": reason });
+                setTimeout(() => {
+                    connect(_this);
+                }, 10000);
             });
-        });
+            wsClient.on("error", (err) => {
+                /**
+                 * Client Error
+                 * @event Client#error
+                 * @type {object}
+                 * @property {Error} error - Error
+                 */
+                _this.emit("error", err);
+            });
+            wsClient.on("message", (rawData) => {
+                zlib.inflate(rawData, (err, _data) => {
+                    if (err) {
+                        return _this.emit("error", err);
+                    }
+                    let data = JSON.parse(_data);
+                    if (data.type == "hello") {
+                        wsClient.send(zlib.deflateSync(JSON.stringify({
+                            "type": "identify",
+                            "data": {
+                                "token": _this.token
+                            }
+                        }), (err) => {
+                            if (err)
+                                _this.emit("error", err);
+                        }));
+                    } else if (data.type == "message") {
+                        /**
+                         * Client Message
+                         * @event Client#message
+                         * @type {object}
+                         * @property {object} message - UGC Message
+                         */
+                        _this.emit("message", data.data.data, data.data.from);
+                    } else if (data.type == "identify") {
+                        /**
+                         * Client Ready
+                         * @event Client#ready
+                         * @type {object}
+                         * @property {object} status - UGC status
+                         */
+                        _this.emit("ready", data.data);
+                    } else if (data.type == "heartbeat") {
+                        /**
+                         * Client Ping
+                         * @type {number}
+                         */
+                        _this.ping = new Date().getTime() - data.data.unix_time * 1000;
+                    }
+                });
+            });
+        }
+        connect(this);
     }
 
     /**

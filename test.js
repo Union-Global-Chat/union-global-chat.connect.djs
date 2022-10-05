@@ -2,14 +2,19 @@ const { Client } = require("./index");
 require("dotenv").config();
 const client = new Client(process.env.UGCTOKEN);
 
-client.on("message", console.log);
-client.on("close", console.log);
-client.on("ready", console.log);
-client.on("error", console.error);
-
-client.fetchChannels("985015284299608084").then(console.log);
-client.deleteMessage("985015284299608084").then(console.log);
+client.on("message", (message) => {
+    console.log("message", message);
+});
+client.on("close", (data) => {
+    console.log("close", data);
+});
+client.on("ready", (data) => {
+    console.log("ready", data);
+});
+client.on("error", (err) => {
+    console.log("error", err);
+});
 
 setInterval(() => {
-    console.log(client.ping);
+    console.log("ping", client.ping);
 }, 10000);
