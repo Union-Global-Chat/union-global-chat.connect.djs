@@ -18,7 +18,7 @@ const Client = class extends EventEmitter {
         this.token = token;
 
         function connect(_this) {
-            var wsClient = new ws("wss://ugc.renorari.net/api/v1/gateway");
+            var wsClient = new ws("wss://ugc.renorari.net/api/v2/gateway");
             /**
              * @fires Client#close
              * @fires Client#error
@@ -79,12 +79,20 @@ const Client = class extends EventEmitter {
                          * @property {object} status - UGC status
                          */
                         _this.emit("ready", data.data);
+                        setInterval(() => {
+                            wsClient.send(zlib.deflateSync(JSON.stringify({
+                                "type": "heartbeat"
+                            }), (err) => {
+                                if (err)
+                                    _this.emit("error", err);
+                            }));
+                        }, 10000);
                     } else if (data.type == "heartbeat") {
                         /**
                          * Client Ping
                          * @type {number}
                          */
-                        _this.ping = new Date().getTime() - data.data.unix_time * 1000;
+                        _this.ping = Math.floor(new Date().getTime() - data.data.unix_time * 1000);
                     }
                 });
             });
@@ -99,7 +107,7 @@ const Client = class extends EventEmitter {
      */
     fetchMessages(messageId) {
         return new Promise((resolve, reject) => {
-            fetch(`https://ugc.renorari.net/api/v1/messages/${messageId}`, {
+            fetch(`https://ugc.renorari.net/api/v2/messages/${messageId}`, {
                 "method": "GET",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
@@ -114,7 +122,7 @@ const Client = class extends EventEmitter {
      */
     fetchAllMessages() {
         return new Promise((resolve, reject) => {
-            fetch("https://ugc.renorari.net/api/v1/messages", {
+            fetch("https://ugc.renorari.net/api/v2/messages", {
                 "method": "GET",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
@@ -130,7 +138,7 @@ const Client = class extends EventEmitter {
      */
     sendMessage(message) {
         return new Promise((resolve, reject) => {
-            fetch("https://ugc.renorari.net/api/v1/messages", {
+            fetch("https://ugc.renorari.net/api/v2/messages", {
                 "method": "POST",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`,
@@ -185,7 +193,7 @@ const Client = class extends EventEmitter {
      */
     deleteMessage(messageId) {
         return new Promise((resolve, reject) => {
-            fetch(`https://ugc.renorari.net/api/v1/messages/${messageId}`, {
+            fetch(`https://ugc.renorari.net/api/v2/messages/${messageId}`, {
                 "method": "DELETE",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
