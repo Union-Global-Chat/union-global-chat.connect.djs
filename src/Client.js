@@ -112,7 +112,7 @@ const Client = class extends EventEmitter {
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
                 }
-            }).then((res) => res.json()).then(resolve).catch(reject);
+            }).then((res) => res.json()).then((data) => {resolve(data.data)}).catch(reject);
         });
     }
 
