@@ -13,12 +13,13 @@ const Client = class extends EventEmitter {
      * @param {string} token - Union Global Chat Token
      * @fires Client#close
      */
-    constructor(token) {
+    constructor(token, uri = "ugc.renorari.net/api/v2") {
         super();
         this.token = token;
+        this.uri = uri;
 
         function connect(_this) {
-            var wsClient = new ws("wss://ugc.renorari.net/api/v2/gateway");
+            var wsClient = new ws(`wss://${_this.uri}/gateway`);
             /**
              * @fires Client#close
              * @fires Client#error
@@ -107,7 +108,7 @@ const Client = class extends EventEmitter {
      */
     fetchMessages(messageId) {
         return new Promise((resolve, reject) => {
-            fetch(`https://ugc.renorari.net/api/v2/messages/${messageId}`, {
+            fetch(`https://${this.uri}/messages/${messageId}`, {
                 "method": "GET",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
@@ -122,7 +123,7 @@ const Client = class extends EventEmitter {
      */
     fetchAllMessages() {
         return new Promise((resolve, reject) => {
-            fetch("https://ugc.renorari.net/api/v2/messages", {
+            fetch(`https://${this.uri}/messages`, {
                 "method": "GET",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
@@ -138,7 +139,7 @@ const Client = class extends EventEmitter {
      */
     sendMessage(message) {
         return new Promise((resolve, reject) => {
-            fetch("https://ugc.renorari.net/api/v2/messages", {
+            fetch(`https://${this.uri}/messages`, {
                 "method": "POST",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`,
@@ -193,7 +194,7 @@ const Client = class extends EventEmitter {
      */
     deleteMessage(messageId) {
         return new Promise((resolve, reject) => {
-            fetch(`https://ugc.renorari.net/api/v2/messages/${messageId}`, {
+            fetch(`https://${this.uri}/messages/${messageId}`, {
                 "method": "DELETE",
                 "headers": {
                     "Authorization": `Bearer ${this.token}`
